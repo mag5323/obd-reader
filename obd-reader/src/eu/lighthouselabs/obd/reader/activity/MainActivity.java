@@ -18,6 +18,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -91,7 +92,13 @@ public class MainActivity extends Activity {
 	private int speed = 1;
 	private double maf = 1;
 	private float ltft = 0;
-	private double equivRatio = 1;
+	private double equivRatio = 1;	
+
+	//set up mediaplayer
+	private MediaPlayer mp = null;	
+	private float MAX_RPM = 16383.75f + 1.0f;
+	private int rpm = 1;
+	private float volume = 0.0f;
 
 	private final SensorEventListener orientListener = new SensorEventListener() {
 		public void onSensorChanged(SensorEvent event) {
@@ -142,23 +149,28 @@ public class MainActivity extends Activity {
 		 * "http://www.whidbeycleaning.com/droid/server.php");
 		 */
 		setContentView(R.layout.main);
-
+		
+		//create a mp3 file
+		mp = MediaPlayer.create(this,R.raw.car);
+		//mp.setLooping(true);
+	
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
 				String cmdName = job.getCommand().getName();
 				String cmdResult = job.getCommand().getFormattedResult();
-
-				Log.d(TAG, FuelTrim.LONG_TERM_BANK_1.getBank() + " equals " + cmdName + "?");
+				
+				Log.d(TAG, FuelTrim.LONG_TERM_BANK_1.getBank() + " equals " + cmdName + "?");			
 				
 				if (AvailableCommandNames.ENGINE_RPM.getValue().equals(cmdName)) {
 					TextView tvRpm = (TextView) findViewById(R.id.rpm_text);
 					tvRpm.setText(cmdResult);
+					rpm = ((EngineRPMObdCommand)job.getCommand()).getRPM();		
 				} else if (AvailableCommandNames.SPEED.getValue().equals(
 						cmdName)) {
 					TextView tvSpeed = (TextView) findViewById(R.id.spd_text);
 					tvSpeed.setText(cmdResult);
 					speed = ((SpeedObdCommand) job.getCommand())
-							.getMetricSpeed();
+							.getMetricSpeed();					
 				} else if (AvailableCommandNames.MAF.getValue().equals(cmdName)) {
 					maf = ((MassAirFlowObdCommand) job.getCommand()).getMAF();
 					addTableRow(cmdName, cmdResult);
@@ -169,6 +181,13 @@ public class MainActivity extends Activity {
 					addTableRow(cmdName, cmdResult);
 				} else {
 					addTableRow(cmdName, cmdResult);
+				}
+				Log.d(TAG, "RPM : " + rpm);					
+								
+				if(rpm>0){
+					volume = (float) (1 - (Math.log(MAX_RPM - rpm) / Math.log(MAX_RPM)));
+					mp.start();
+					mp.setVolume(volume, volume);	
 				}
 			}
 		};
