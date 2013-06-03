@@ -80,8 +80,8 @@ public class MainActivity extends Activity {
 	private Intent mServiceIntent = null;
 	private ObdGatewayServiceConnection mServiceConnection = null;
 
-	private SensorManager sensorManager = null;
-	private Sensor orientSensor = null;
+	//private SensorManager sensorManager = null;
+	//private Sensor orientSensor = null;
 	private SharedPreferences prefs = null;
 
 	private PowerManager powerManager = null;
@@ -100,7 +100,7 @@ public class MainActivity extends Activity {
 	private int rpm = 1;
 	private float volume = 0.0f;
 
-	private final SensorEventListener orientListener = new SensorEventListener() {
+	/*private final SensorEventListener orientListener = new SensorEventListener() {
 		public void onSensorChanged(SensorEvent event) {
 			float x = event.values[0];
 			String dir = "";
@@ -128,7 +128,7 @@ public class MainActivity extends Activity {
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
 			// TODO Auto-generated method stub
 		}
-	};
+	};*/
 
 	public void updateTextView(final TextView view, final String txt) {
 		new Handler().post(new Runnable() {
@@ -171,7 +171,7 @@ public class MainActivity extends Activity {
 					tvSpeed.setText(cmdResult);
 					speed = ((SpeedObdCommand) job.getCommand())
 							.getMetricSpeed();					
-				} else if (AvailableCommandNames.MAF.getValue().equals(cmdName)) {
+				} /*else if (AvailableCommandNames.MAF.getValue().equals(cmdName)) {
 					maf = ((MassAirFlowObdCommand) job.getCommand()).getMAF();
 					addTableRow(cmdName, cmdResult);
 				} else if (FuelTrim.LONG_TERM_BANK_1.getBank().equals(cmdName)) {
@@ -181,7 +181,7 @@ public class MainActivity extends Activity {
 					addTableRow(cmdName, cmdResult);
 				} else {
 					addTableRow(cmdName, cmdResult);
-				}
+				}*/
 				Log.d(TAG, "RPM : " + rpm);					
 								
 				if(rpm>0){
@@ -224,14 +224,14 @@ public class MainActivity extends Activity {
 		/*
 		 * Get Orientation sensor.
 		 */
-		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		/*sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		List<Sensor> sens = sensorManager
 				.getSensorList(Sensor.TYPE_ORIENTATION);
 		if (sens.size() <= 0) {
 			showDialog(NO_ORIENTATION_SENSOR);
 		} else {
 			orientSensor = sens.get(0);
-		}
+		}*/
 
 		// validate app pre-requisites
 		if (preRequisites) {
@@ -240,6 +240,7 @@ public class MainActivity extends Activity {
 			 */
 			mServiceIntent = new Intent(this, ObdGatewayService.class);
 			mServiceConnection = new ObdGatewayServiceConnection();
+			/*start listening here*/
 			mServiceConnection.setServiceListener(mListener);
 
 			// bind service
@@ -282,8 +283,8 @@ public class MainActivity extends Activity {
 
 		Log.d(TAG, "Resuming..");
 
-		sensorManager.registerListener(orientListener, orientSensor,
-				SensorManager.SENSOR_DELAY_UI);
+		//sensorManager.registerListener(orientListener, orientSensor,
+		//		SensorManager.SENSOR_DELAY_UI);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK,
@@ -401,7 +402,7 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-	private void addTableRow(String key, String val) {
+	/*private void addTableRow(String key, String val) {
 		TableLayout tl = (TableLayout) findViewById(R.id.data_table);
 		TableRow tr = new TableRow(this);
 		MarginLayoutParams params = new ViewGroup.MarginLayoutParams(
@@ -419,16 +420,16 @@ public class MainActivity extends Activity {
 		tr.addView(name);
 		tr.addView(value);
 		tl.addView(tr, new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT));
+				LayoutParams.WRAP_CONTENT));*/
 
 		/*
 		 * TODO remove this hack
 		 * 
 		 * let's define a limit number of rows
 		 */
-		if (tl.getChildCount() > 10)
-			tl.removeViewAt(0);
-	}
+		//if (tl.getChildCount() > 10)
+		//	tl.removeViewAt(0);
+	//}
 
 	/**
 	 * 
@@ -442,9 +443,9 @@ public class MainActivity extends Activity {
 			if (speed > 1 && maf > 1 && ltft != 0) {
 				FuelEconomyWithMAFObdCommand fuelEconCmd = new FuelEconomyWithMAFObdCommand(
 						FuelType.DIESEL, speed, maf, ltft, false /* TODO */);
-				TextView tvMpg = (TextView) findViewById(R.id.fuel_econ_text);
+				//TextView tvMpg = (TextView) findViewById(R.id.fuel_econ_text);
 				String liters100km = String.format("%.2f", fuelEconCmd.getLitersPer100Km());
-				tvMpg.setText("" + liters100km);
+				//tvMpg.setText("" + liters100km);
 				Log.d(TAG, "FUELECON:" + liters100km);
 			}
 
