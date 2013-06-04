@@ -41,7 +41,7 @@ public class EngineRPMObdCommand extends ObdCommand {
 			_rpm = (a * 256 + b) / 4;
 		}
 
-		return String.format("%d%s", _rpm, " RPM");
+		return String.format("%d%s", _rpm, "");
 	}
 
 	@Override

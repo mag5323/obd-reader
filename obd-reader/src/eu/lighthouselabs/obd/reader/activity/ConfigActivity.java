@@ -171,8 +171,8 @@ public class ConfigActivity extends PreferenceActivity implements
 	 */
 	public static int getUpdatePeriod(SharedPreferences prefs) {
 		String periodString = prefs.getString(ConfigActivity.UPDATE_PERIOD_KEY,
-				"4"); // 4 as in seconds
-		int period = 4000; // by default 4000ms
+				"0.25"); // 4 as in seconds
+		int period = 250; // by default 4000ms
 
 		try {
 			period = Integer.parseInt(periodString) * 1000;

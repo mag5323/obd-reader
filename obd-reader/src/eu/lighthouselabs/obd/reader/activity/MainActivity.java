@@ -27,9 +27,11 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -93,42 +95,14 @@ public class MainActivity extends Activity {
 	private double maf = 1;
 	private float ltft = 0;
 	private double equivRatio = 1;	
+	private Button stopBtn;
+	private TextView tvRpm,tvSpeed;
 
 	//set up mediaplayer
 	private MediaPlayer mp = null;	
 	private float MAX_RPM = 16383.75f + 1.0f;
 	private int rpm = 1;
 	private float volume = 0.0f;
-
-	/*private final SensorEventListener orientListener = new SensorEventListener() {
-		public void onSensorChanged(SensorEvent event) {
-			float x = event.values[0];
-			String dir = "";
-			if (x >= 337.5 || x < 22.5) {
-				dir = "N";
-			} else if (x >= 22.5 && x < 67.5) {
-				dir = "NE";
-			} else if (x >= 67.5 && x < 112.5) {
-				dir = "E";
-			} else if (x >= 112.5 && x < 157.5) {
-				dir = "SE";
-			} else if (x >= 157.5 && x < 202.5) {
-				dir = "S";
-			} else if (x >= 202.5 && x < 247.5) {
-				dir = "SW";
-			} else if (x >= 247.5 && x < 292.5) {
-				dir = "W";
-			} else if (x >= 292.5 && x < 337.5) {
-				dir = "NW";
-			}
-			TextView compass = (TextView) findViewById(R.id.compass_text);
-			updateTextView(compass, dir);
-		}
-
-		public void onAccuracyChanged(Sensor sensor, int accuracy) {
-			// TODO Auto-generated method stub
-		}
-	};*/
 
 	public void updateTextView(final TextView view, final String txt) {
 		new Handler().post(new Runnable() {
@@ -150,6 +124,11 @@ public class MainActivity extends Activity {
 		 */
 		setContentView(R.layout.main);
 		
+		//set up Button& TextView
+		stopBtn = (Button)findViewById(R.id.STOP);
+		tvRpm = (TextView) findViewById(R.id.rpm_text);
+		tvSpeed = (TextView) findViewById(R.id.spd_text);
+		
 		//create a mp3 file
 		mp = MediaPlayer.create(this,R.raw.car);
 		//mp.setLooping(true);
@@ -161,27 +140,16 @@ public class MainActivity extends Activity {
 				
 				Log.d(TAG, FuelTrim.LONG_TERM_BANK_1.getBank() + " equals " + cmdName + "?");			
 				
-				if (AvailableCommandNames.ENGINE_RPM.getValue().equals(cmdName)) {
-					TextView tvRpm = (TextView) findViewById(R.id.rpm_text);
+				if (AvailableCommandNames.ENGINE_RPM.getValue().equals(cmdName)) {					
 					tvRpm.setText(cmdResult);
 					rpm = ((EngineRPMObdCommand)job.getCommand()).getRPM();		
 				} else if (AvailableCommandNames.SPEED.getValue().equals(
-						cmdName)) {
-					TextView tvSpeed = (TextView) findViewById(R.id.spd_text);
+						cmdName)) {					
 					tvSpeed.setText(cmdResult);
 					speed = ((SpeedObdCommand) job.getCommand())
 							.getMetricSpeed();					
-				} /*else if (AvailableCommandNames.MAF.getValue().equals(cmdName)) {
-					maf = ((MassAirFlowObdCommand) job.getCommand()).getMAF();
-					addTableRow(cmdName, cmdResult);
-				} else if (FuelTrim.LONG_TERM_BANK_1.getBank().equals(cmdName)) {
-					ltft = ((FuelTrimObdCommand) job.getCommand()).getValue();
-				} else if (AvailableCommandNames.EQUIV_RATIO.getValue().equals(cmdName)) {
-					equivRatio = ((CommandEquivRatioObdCommand) job.getCommand()).getRatio();
-					addTableRow(cmdName, cmdResult);
-				} else {
-					addTableRow(cmdName, cmdResult);
-				}*/
+				} 
+				
 				Log.d(TAG, "RPM : " + rpm);					
 								
 				if(rpm>0){
@@ -221,18 +189,6 @@ public class MainActivity extends Activity {
 			}
 		}
 
-		/*
-		 * Get Orientation sensor.
-		 */
-		/*sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		List<Sensor> sens = sensorManager
-				.getSensorList(Sensor.TYPE_ORIENTATION);
-		if (sens.size() <= 0) {
-			showDialog(NO_ORIENTATION_SENSOR);
-		} else {
-			orientSensor = sens.get(0);
-		}*/
-
 		// validate app pre-requisites
 		if (preRequisites) {
 			/*
@@ -248,6 +204,14 @@ public class MainActivity extends Activity {
 			bindService(mServiceIntent, mServiceConnection,
 					Context.BIND_AUTO_CREATE);
 		}
+		
+		//stopLiveDatta
+		stopBtn.setOnClickListener(new Button.OnClickListener(){
+			@Override
+            public void onClick(View v) {
+				stopLiveData();
+			}		
+		});
 	}
 
 	@Override
@@ -283,8 +247,6 @@ public class MainActivity extends Activity {
 
 		Log.d(TAG, "Resuming..");
 
-		//sensorManager.registerListener(orientListener, orientSensor,
-		//		SensorManager.SENSOR_DELAY_UI);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK,
@@ -309,9 +271,9 @@ public class MainActivity extends Activity {
 		case START_LIVE_DATA:
 			startLiveData();
 			return true;
-		case STOP_LIVE_DATA:
+		/*case STOP_LIVE_DATA:
 			stopLiveData();
-			return true;
+			return true;*/
 		case SETTINGS:
 			updateConfig();
 			return true;
@@ -350,7 +312,9 @@ public class MainActivity extends Activity {
 
 		// remove runnable
 		mHandler.removeCallbacks(mQueueCommands);
-
+		
+		tvRpm.setText("0");
+		tvSpeed.setText("0");
 		releaseWakeLockIfHeld();
 	}
 
@@ -402,35 +366,6 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-	/*private void addTableRow(String key, String val) {
-		TableLayout tl = (TableLayout) findViewById(R.id.data_table);
-		TableRow tr = new TableRow(this);
-		MarginLayoutParams params = new ViewGroup.MarginLayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		params.setMargins(TABLE_ROW_MARGIN, TABLE_ROW_MARGIN, TABLE_ROW_MARGIN,
-				TABLE_ROW_MARGIN);
-		tr.setLayoutParams(params);
-		tr.setBackgroundColor(Color.BLACK);
-		TextView name = new TextView(this);
-		name.setGravity(Gravity.RIGHT);
-		name.setText(key + ": ");
-		TextView value = new TextView(this);
-		value.setGravity(Gravity.LEFT);
-		value.setText(val);
-		tr.addView(name);
-		tr.addView(value);
-		tl.addView(tr, new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT));*/
-
-		/*
-		 * TODO remove this hack
-		 * 
-		 * let's define a limit number of rows
-		 */
-		//if (tl.getChildCount() > 10)
-		//	tl.removeViewAt(0);
-	//}
-
 	/**
 	 * 
 	 */
@@ -480,16 +415,10 @@ public class MainActivity extends Activity {
 				FuelTrim.SHORT_TERM_BANK_2));
 		final ObdCommandJob equiv = new ObdCommandJob(new CommandEquivRatioObdCommand());
 
-		// mServiceConnection.addJobToQueue(airTemp);
 		mServiceConnection.addJobToQueue(speed);
-		// mServiceConnection.addJobToQueue(fuelEcon);
 		mServiceConnection.addJobToQueue(rpm);
 		mServiceConnection.addJobToQueue(maf);
 		mServiceConnection.addJobToQueue(fuelLevel);
-//		mServiceConnection.addJobToQueue(equiv);
 		mServiceConnection.addJobToQueue(ltft1);
-		// mServiceConnection.addJobToQueue(ltft2);
-		// mServiceConnection.addJobToQueue(stft1);
-		// mServiceConnection.addJobToQueue(stft2);
 	}
 }
