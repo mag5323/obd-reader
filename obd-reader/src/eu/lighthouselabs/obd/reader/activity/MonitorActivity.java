@@ -3,6 +3,7 @@
  */
 package eu.lighthouselabs.obd.reader.activity;
 
+import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
@@ -19,6 +20,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -105,6 +107,7 @@ public class MonitorActivity extends Activity {
 	private float MAX_RPM = 16383.75f + 1.0f;
 	private int rpm = 1;
 	private float volume = 0.0f;
+	Bundle bundle = null;
 
 	public void updateTextView(final TextView view, final String txt) {
 		new Handler().post(new Runnable() {
@@ -135,9 +138,14 @@ public class MonitorActivity extends Activity {
 		tvSpeed = (TextView) findViewById(R.id.spd_text);
 		
 		//create a mp3 file
-		mp = MediaPlayer.create(this,R.raw.car);
-		//mp.setLooping(true);
-	
+		bundle = getIntent().getExtras();
+		/*Uri carUri = Uri.parse("android.resource://eu.lighthouselabs.obd.reader.activity/raw/" + 
+								bundle.getString("car"));*/
+		
+		//Log.d(TAG,"Uri : " + carUri);
+		
+		mp = MediaPlayer.create(this,R.raw.porsche_gt3);
+
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
 				String cmdName = job.getCommand().getName();
@@ -159,8 +167,8 @@ public class MonitorActivity extends Activity {
 								
 				if(rpm>0){
 					volume = (float) (1 - (Math.log(MAX_RPM - rpm) / Math.log(MAX_RPM)));
-					mp.start();
-					mp.setVolume(volume, volume);	
+					mp.start();		
+					mp.setVolume(volume, volume);
 				}
 			}
 		};
@@ -300,9 +308,9 @@ public class MonitorActivity extends Activity {
 		case SETTINGS:
 			updateConfig();
 			return true;
-			// case COMMAND_ACTIVITY:
-			// staticCommand();
-			// return true;
+		case COMMAND_ACTIVITY:
+			//staticCommand();
+			return true;
 		}
 		return false;
 	}
