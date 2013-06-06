@@ -84,8 +84,6 @@ public class MonitorActivity extends Activity {
 	private Intent mServiceIntent = null;
 	private ObdGatewayServiceConnection mServiceConnection = null;
 
-	//private SensorManager sensorManager = null;
-	//private Sensor orientSensor = null;
 	private SharedPreferences prefs = null;
 
 	private PowerManager powerManager = null;
@@ -95,7 +93,7 @@ public class MonitorActivity extends Activity {
 
 	private int speed = 1;
 	private double maf = 1;
-	private float ltft = 0;
+	private float ltft = 0;	
 	private double equivRatio = 1;	
 	private Button stopBtn = null;
 	private Button backBtn = null;
@@ -129,23 +127,29 @@ public class MonitorActivity extends Activity {
 		 */
 		setContentView(R.layout.monitor);
 		
-		//set up Button& TextView
-		/*stopBtn = (Button)findViewById(R.id.STOP);
-		backBtn = (Button)findViewById(R.id.BACK);
-		startBtn = (Button)findViewById(R.id.START);*/
-		
 		tvRpm = (TextView) findViewById(R.id.rpm_text);
 		tvSpeed = (TextView) findViewById(R.id.spd_text);
 		
 		//create a mp3 file
 		bundle = getIntent().getExtras();
-		/*Uri carUri = Uri.parse("android.resource://eu.lighthouselabs.obd.reader.activity/raw/" + 
-								bundle.getString("car"));*/
+		Uri carUri = Uri.parse("android.resource://" + getPackageName() + "/R.raw." + bundle.getString("car"));
+		Log.d(TAG,"Uri : " + carUri);		
 		
-		//Log.d(TAG,"Uri : " + carUri);
+		//mp = MediaPlayer.create(this,carUri);
+		try{
+			mp.setDataSource(this, carUri);
+			mp.prepare();
+			mp.start();
+		}
+		catch(NullPointerException e){
+			Log.d(TAG,"NullPointerException");
+			e.printStackTrace();			
+		}
+		catch(Exception e){
+			Log.d(TAG,"Exception");
+			e.printStackTrace();
+		}
 		
-		mp = MediaPlayer.create(this,R.raw.porsche_gt3);
-
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
 				String cmdName = job.getCommand().getName();
@@ -217,32 +221,6 @@ public class MonitorActivity extends Activity {
 			bindService(mServiceIntent, mServiceConnection,
 					Context.BIND_AUTO_CREATE);
 		}
-		/*
-		//startLiveData
-				stopBtn.setOnClickListener(new Button.OnClickListener(){
-					@Override
-		            public void onClick(View v) {
-						startLiveData();				
-					}		
-				});
-		
-		//stopLiveData
-		stopBtn.setOnClickListener(new Button.OnClickListener(){
-			@Override
-            public void onClick(View v) {
-				stopLiveData();				
-			}		
-		});
-		
-		//back to previous page
-		backBtn.setOnClickListener(new Button.OnClickListener(){
-			@Override
-		    public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.setClass(MonitorActivity.this, MainActivity.class);
-				startActivity(intent);
-			}		
-		});*/
 	}
 
 	@Override
@@ -254,7 +232,10 @@ public class MonitorActivity extends Activity {
 		mServiceConnection = null;
 		mListener = null;
 		mHandler = null;
-
+		
+		if (mp !=  null )  {
+			mp.release();  
+		}
 	}
 
 	@Override
@@ -414,6 +395,7 @@ public class MonitorActivity extends Activity {
 
 			if (mServiceConnection.isRunning())
 				queueCommands();
+				Log.d(TAG,"queueCommands();");
 
 			// run again in 2s
 			mHandler.postDelayed(mQueueCommands, 2000);
