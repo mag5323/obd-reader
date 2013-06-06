@@ -94,10 +94,7 @@ public class MonitorActivity extends Activity {
 	private int speed = 1;
 	private double maf = 1;
 	private float ltft = 0;	
-	private double equivRatio = 1;	
-	private Button stopBtn = null;
-	private Button backBtn = null;
-	private Button startBtn = null;
+	private double equivRatio = 1;
 	private TextView tvRpm = null, tvSpeed = null;
 
 	//set up mediaplayer
@@ -106,7 +103,7 @@ public class MonitorActivity extends Activity {
 	private int rpm = 1;
 	private float volume = 0.0f;
 	Bundle bundle = null;
-	private int carIndex = -1;
+	private int carIndex;
 
 	public void updateTextView(final TextView view, final String txt) {
 		new Handler().post(new Runnable() {
@@ -131,32 +128,38 @@ public class MonitorActivity extends Activity {
 		tvRpm = (TextView) findViewById(R.id.rpm_text);
 		tvSpeed = (TextView) findViewById(R.id.spd_text);
 		
+		//create a mp3 file
 		bundle = getIntent().getExtras();
-		carIndex = bundle.getInt("carIndex");	
-		
-		Log.d("carIndex:",String.valueOf(carIndex));
-		
-		/*switch(carIndex){
+		carIndex = bundle.getInt("carIndex");
+		try{
+			switch(carIndex){
 			case 0:
-				mp.create(this, R.raw.bentley_continental_gt);
+				mp = MediaPlayer.create(this,R.raw.bentley_continental_gt);
 				break;
 			case 1:
-				mp.create(this, R.raw.mini_coopers_coupe);
+				mp = MediaPlayer.create(this,R.raw.mini_coopers_coupe);
 				break;
 			case 2:
-				mp.create(this, R.raw.mustang_shelby_gt500);
+				mp = MediaPlayer.create(this,R.raw.mustang_shelby_gt500);
 				break;
 			case 3:
-				mp.create(this, R.raw.nissan_370zs);
+				mp = MediaPlayer.create(this,R.raw.nissan_370zs);
 				break;
 			case 4:
-				mp.create(this, R.raw.porsche_gt3);
+				mp = MediaPlayer.create(this,R.raw.porsche_gt3);
 				break;
-			default:
-				break;				
-		}*/
+			}
+					
+		}
+		catch(NullPointerException e){
+			e.printStackTrace();
+		}
+		catch(Exception e){
+			e.printStackTrace();			
+		}
 		
-		mp.create(this, R.raw.porsche_gt3);
+		Log.d("carIndex:",String.valueOf(carIndex));		
+		
 		
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
@@ -433,7 +436,7 @@ public class MonitorActivity extends Activity {
 				FuelTrim.SHORT_TERM_BANK_2));
 		final ObdCommandJob equiv = new ObdCommandJob(new CommandEquivRatioObdCommand());
 
-		//mServiceConnection.addJobToQueue(speed);
+		mServiceConnection.addJobToQueue(speed);
 		mServiceConnection.addJobToQueue(rpm);
 		mServiceConnection.addJobToQueue(maf);
 		mServiceConnection.addJobToQueue(fuelLevel);

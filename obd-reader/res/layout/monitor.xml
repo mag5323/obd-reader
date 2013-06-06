@@ -16,7 +16,7 @@
         android:id="@+id/spd_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" 
-        android:textSize="150dp" 
+        android:textSize="110dp" 
         android:gravity="center"
         android:text="0" />
     
@@ -39,7 +39,7 @@
         android:id="@+id/rpm_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" 
-        android:textSize="150dp" 
+        android:textSize="110dp" 
         android:gravity="center"
         android:text="0" />     
      

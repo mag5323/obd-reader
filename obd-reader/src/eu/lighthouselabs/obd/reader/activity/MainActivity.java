@@ -21,12 +21,12 @@ public class MainActivity extends Activity {
 	private Spinner carSpin;
 	private Button enterBtn; 
 	private ImageView carImage;
+	private int carIndex;
 	private int[] carDraw = {R.drawable.bentley_continental_gt,
 							 R.drawable.mini_coopers_coupe,
 							 R.drawable.mustang_shelby_gt500,
 							 R.drawable.nissan370zs,
 							 R.drawable.porsche_gt3};
-	private int carIndex = -1;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
