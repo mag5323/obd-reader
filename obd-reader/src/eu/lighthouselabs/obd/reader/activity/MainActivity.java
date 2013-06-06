@@ -26,6 +26,7 @@ public class MainActivity extends Activity {
 							 R.drawable.mustang_shelby_gt500,
 							 R.drawable.nissan370zs,
 							 R.drawable.porsche_gt3};
+	private int carIndex = -1;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,18 +48,23 @@ public class MainActivity extends Activity {
             	switch(arg2){
             	case 0:
             		carImage.setImageResource(carDraw[0]);
+            		carIndex = 0;
             		break;
             	case 1:
             		carImage.setImageResource(carDraw[1]);
+            		carIndex = 1;
             		break;
             	case 2:
             		carImage.setImageResource(carDraw[2]);
+            		carIndex = 2;
             		break;
             	case 3:
             		carImage.setImageResource(carDraw[3]);
+            		carIndex = 3;
             		break;
             	case 4:
             		carImage.setImageResource(carDraw[4]);
+            		carIndex = 4;
             		break;
             	}	
             }
@@ -75,7 +81,7 @@ public class MainActivity extends Activity {
 			@Override
             public void onClick(View v) {
 				Bundle bundle = new Bundle();
-				bundle.putString("car", carSpin.getSelectedItem().toString());
+				bundle.putInt("carIndex",carIndex);
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, MonitorActivity.class);
 				intent.putExtras(bundle);

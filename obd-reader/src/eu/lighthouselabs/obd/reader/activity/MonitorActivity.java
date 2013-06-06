@@ -101,11 +101,12 @@ public class MonitorActivity extends Activity {
 	private TextView tvRpm = null, tvSpeed = null;
 
 	//set up mediaplayer
-	private MediaPlayer mp = null;	
+	private MediaPlayer mp;
 	private float MAX_RPM = 16383.75f + 1.0f;
 	private int rpm = 1;
 	private float volume = 0.0f;
 	Bundle bundle = null;
+	private int carIndex = -1;
 
 	public void updateTextView(final TextView view, final String txt) {
 		new Handler().post(new Runnable() {
@@ -130,25 +131,32 @@ public class MonitorActivity extends Activity {
 		tvRpm = (TextView) findViewById(R.id.rpm_text);
 		tvSpeed = (TextView) findViewById(R.id.spd_text);
 		
-		//create a mp3 file
 		bundle = getIntent().getExtras();
-		Uri carUri = Uri.parse("android.resource://" + getPackageName() + "/R.raw." + bundle.getString("car"));
-		Log.d(TAG,"Uri : " + carUri);		
+		carIndex = bundle.getInt("carIndex");	
 		
-		//mp = MediaPlayer.create(this,carUri);
-		try{
-			mp.setDataSource(this, carUri);
-			mp.prepare();
-			mp.start();
-		}
-		catch(NullPointerException e){
-			Log.d(TAG,"NullPointerException");
-			e.printStackTrace();			
-		}
-		catch(Exception e){
-			Log.d(TAG,"Exception");
-			e.printStackTrace();
-		}
+		Log.d("carIndex:",String.valueOf(carIndex));
+		
+		/*switch(carIndex){
+			case 0:
+				mp.create(this, R.raw.bentley_continental_gt);
+				break;
+			case 1:
+				mp.create(this, R.raw.mini_coopers_coupe);
+				break;
+			case 2:
+				mp.create(this, R.raw.mustang_shelby_gt500);
+				break;
+			case 3:
+				mp.create(this, R.raw.nissan_370zs);
+				break;
+			case 4:
+				mp.create(this, R.raw.porsche_gt3);
+				break;
+			default:
+				break;				
+		}*/
+		
+		mp.create(this, R.raw.porsche_gt3);
 		
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
@@ -170,7 +178,7 @@ public class MonitorActivity extends Activity {
 				Log.d(TAG, "RPM : " + rpm);					
 								
 				if(rpm>0){
-					volume = (float) (1 - (Math.log(MAX_RPM - rpm) / Math.log(MAX_RPM)));
+					volume = (float) (1 - (Math.log(MAX_RPM - rpm) / Math.log(MAX_RPM)));					
 					mp.start();		
 					mp.setVolume(volume, volume);
 				}
@@ -425,7 +433,7 @@ public class MonitorActivity extends Activity {
 				FuelTrim.SHORT_TERM_BANK_2));
 		final ObdCommandJob equiv = new ObdCommandJob(new CommandEquivRatioObdCommand());
 
-		mServiceConnection.addJobToQueue(speed);
+		//mServiceConnection.addJobToQueue(speed);
 		mServiceConnection.addJobToQueue(rpm);
 		mServiceConnection.addJobToQueue(maf);
 		mServiceConnection.addJobToQueue(fuelLevel);
