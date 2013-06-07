@@ -23,8 +23,8 @@ public class DataUploader {
 	public String uploadRecord(String urlStr, Map<String,String> data) throws IOException, URISyntaxException {
 		String encData = getEncodedData(data);
         HttpParams params = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(params, 5000);
-        HttpConnectionParams.setSoTimeout(params, 30000);
+        HttpConnectionParams.setConnectionTimeout(params, 500);
+        HttpConnectionParams.setSoTimeout(params, 3000);
         HttpClient client = new DefaultHttpClient(params);
         HttpPost request = new HttpPost();
         request.setURI(new URI(urlStr));

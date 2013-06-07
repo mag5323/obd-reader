@@ -99,7 +99,7 @@ public class MonitorActivity extends Activity {
 
 	//set up mediaplayer
 	private MediaPlayer mp;
-	private float MAX_RPM = 16383.75f + 1.0f;
+	private float MAX_RPM = 16383.75f / 2.0f;
 	private int rpm = 1;
 	private float volume = 0.0f;
 	Bundle bundle = null;
@@ -156,10 +156,7 @@ public class MonitorActivity extends Activity {
 		}
 		catch(Exception e){
 			e.printStackTrace();			
-		}
-		
-		Log.d("carIndex:",String.valueOf(carIndex));		
-		
+		}		
 		
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
@@ -169,8 +166,14 @@ public class MonitorActivity extends Activity {
 				Log.d(TAG, FuelTrim.LONG_TERM_BANK_1.getBank() + " equals " + cmdName + "?");			
 				
 				if (AvailableCommandNames.ENGINE_RPM.getValue().equals(cmdName)) {					
-					tvRpm.setText(cmdResult);
-					rpm = ((EngineRPMObdCommand)job.getCommand()).getRPM();		
+					rpm = ((EngineRPMObdCommand)job.getCommand()).getRPM();
+					if(rpm >= 2000){
+						rpm = ((rpm+1)) / 2;
+						tvRpm.setText(String.valueOf(rpm));						
+					}else{						
+						tvRpm.setText("0");
+					}
+										
 				} else if (AvailableCommandNames.SPEED.getValue().equals(
 						cmdName)) {					
 					tvSpeed.setText(cmdResult);
@@ -180,7 +183,7 @@ public class MonitorActivity extends Activity {
 				
 				Log.d(TAG, "RPM : " + rpm);					
 								
-				if(rpm>0){
+				if(rpm >= 2000){
 					volume = (float) (1 - (Math.log(MAX_RPM - rpm) / Math.log(MAX_RPM)));					
 					mp.start();		
 					mp.setVolume(volume, volume);
@@ -324,17 +327,16 @@ public class MonitorActivity extends Activity {
 
 	private void stopLiveData() {
 		Log.d(TAG, "Stopping live data..");
-
-		if (mServiceConnection.isRunning())
-			stopService(mServiceIntent);
-
-		// remove runnable
-		mHandler.removeCallbacks(mQueueCommands);
 		
 		tvRpm.setText("0");
 		tvSpeed.setText("0");
 		mp.stop();
 		
+		if (mServiceConnection.isRunning())
+			stopService(mServiceIntent);
+
+		// remove runnable
+		mHandler.removeCallbacks(mQueueCommands);		
 		releaseWakeLockIfHeld();
 	}
 
