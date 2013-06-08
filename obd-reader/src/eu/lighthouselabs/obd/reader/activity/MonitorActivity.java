@@ -99,7 +99,7 @@ public class MonitorActivity extends Activity {
 
 	//set up mediaplayer
 	private MediaPlayer mp;
-	private float MAX_RPM = 16383.75f / 2.0f;
+	private int MAX_RPM = 16384 / 2;
 	private int rpm = 1;
 	private float volume = 0.0f;
 	Bundle bundle = null;
@@ -184,7 +184,11 @@ public class MonitorActivity extends Activity {
 				Log.d(TAG, "RPM : " + rpm);					
 								
 				if(rpm >= 2000){
-					volume = (float) (1 - (Math.log(MAX_RPM - rpm) / Math.log(MAX_RPM)));					
+					int temp = MAX_RPM - rpm; 
+					volume = (float) (1 - (Math.log(temp>0 ? temp:1) / Math.log(MAX_RPM)));			
+					
+					Log.d(TAG ,"volume : " + String.valueOf(volume));
+					
 					mp.start();		
 					mp.setVolume(volume, volume);
 				}
@@ -410,8 +414,8 @@ public class MonitorActivity extends Activity {
 				queueCommands();
 				Log.d(TAG,"queueCommands();");
 
-			// run again in 2s
-			mHandler.postDelayed(mQueueCommands, 2000);
+			// run again in 0.001s
+			mHandler.postDelayed(mQueueCommands,1);
 		}
 	};
 
@@ -419,13 +423,13 @@ public class MonitorActivity extends Activity {
 	 * 
 	 */
 	private void queueCommands() {
-		final ObdCommandJob airTemp = new ObdCommandJob(
-				new AmbientAirTemperatureObdCommand());
+		/*final ObdCommandJob airTemp = new ObdCommandJob(
+				new AmbientAirTemperatureObdCommand());*/
 		final ObdCommandJob speed = new ObdCommandJob(new SpeedObdCommand());
-		final ObdCommandJob fuelEcon = new ObdCommandJob(
-				new FuelEconomyObdCommand());
+		/*final ObdCommandJob fuelEcon = new ObdCommandJob(
+				new FuelEconomyObdCommand());*/
 		final ObdCommandJob rpm = new ObdCommandJob(new EngineRPMObdCommand());
-		final ObdCommandJob maf = new ObdCommandJob(new MassAirFlowObdCommand());
+		/*final ObdCommandJob maf = new ObdCommandJob(new MassAirFlowObdCommand());
 		final ObdCommandJob fuelLevel = new ObdCommandJob(
 				new FuelLevelObdCommand());
 		final ObdCommandJob ltft1 = new ObdCommandJob(new FuelTrimObdCommand(
@@ -436,12 +440,12 @@ public class MonitorActivity extends Activity {
 				FuelTrim.SHORT_TERM_BANK_1));
 		final ObdCommandJob stft2 = new ObdCommandJob(new FuelTrimObdCommand(
 				FuelTrim.SHORT_TERM_BANK_2));
-		final ObdCommandJob equiv = new ObdCommandJob(new CommandEquivRatioObdCommand());
+		final ObdCommandJob equiv = new ObdCommandJob(new CommandEquivRatioObdCommand());*/
 
 		mServiceConnection.addJobToQueue(speed);
 		mServiceConnection.addJobToQueue(rpm);
-		mServiceConnection.addJobToQueue(maf);
+		/*mServiceConnection.addJobToQueue(maf);
 		mServiceConnection.addJobToQueue(fuelLevel);
-		mServiceConnection.addJobToQueue(ltft1);
+		mServiceConnection.addJobToQueue(ltft1);*/
 	}
 }
