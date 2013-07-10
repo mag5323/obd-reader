@@ -6,6 +6,13 @@ package eu.lighthouselabs.obd.reader.activity;
 import java.io.IOException;
 import java.util.List;
 
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.model.CategorySeries;
+import org.achartengine.renderer.DialRenderer;
+import org.achartengine.renderer.SimpleSeriesRenderer;
+import org.achartengine.renderer.DialRenderer.Type;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -34,6 +41,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -60,7 +68,7 @@ import eu.lighthouselabs.obd.reader.io.ObdGatewayServiceConnection;
  */
 public class MonitorActivity extends Activity {
 
-	private static final String TAG = "MainActivity";
+	private static final String TAG = "MonitorActivity";
 
 	/*
 	 * TODO put description
@@ -104,7 +112,11 @@ public class MonitorActivity extends Activity {
 	private float volume = 0.0f;
 	Bundle bundle = null;
 	private int carIndex;
-
+	
+	//Dial-chart
+	private GraphicalView mChartView;
+	private CategorySeries category;
+	
 	public void updateTextView(final TextView view, final String txt) {
 		new Handler().post(new Runnable() {
 			public void run() {
@@ -125,7 +137,6 @@ public class MonitorActivity extends Activity {
 		 */
 		setContentView(R.layout.monitor);
 		
-		tvRpm = (TextView) findViewById(R.id.rpm_text);
 		tvSpeed = (TextView) findViewById(R.id.spd_text);
 		
 		//create a mp3 file
@@ -156,22 +167,22 @@ public class MonitorActivity extends Activity {
 		}
 		catch(Exception e){
 			e.printStackTrace();			
-		}		
+		}			
 		
+		//initialize Dial-chart(RPM)		
+        category = new CategorySeries("RPM");
+        category.add("RPM", 0);
+        setupDialChart();        
+       
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
 				String cmdName = job.getCommand().getName();
 				String cmdResult = job.getCommand().getFormattedResult();
 				
-				Log.d(TAG, FuelTrim.LONG_TERM_BANK_1.getBank() + " equals " + cmdName + "?");			
-				
 				if (AvailableCommandNames.ENGINE_RPM.getValue().equals(cmdName)) {					
 					rpm = ((EngineRPMObdCommand)job.getCommand()).getRPM();
 					if(rpm >= 2000){
-						rpm = ((rpm+1)) / 2;
-						tvRpm.setText(String.valueOf(rpm));						
-					}else{						
-						tvRpm.setText("0");
+						rpm = ((rpm+1)) / 2;	
 					}
 										
 				} else if (AvailableCommandNames.SPEED.getValue().equals(
@@ -179,7 +190,7 @@ public class MonitorActivity extends Activity {
 					tvSpeed.setText(cmdResult);
 					speed = ((SpeedObdCommand) job.getCommand())
 							.getMetricSpeed();					
-				} 
+				}
 				
 				Log.d(TAG, "RPM : " + rpm);					
 								
@@ -187,11 +198,23 @@ public class MonitorActivity extends Activity {
 					int temp = MAX_RPM - rpm; 
 					volume = (float) (1 - (Math.log(temp>0 ? temp:1) / Math.log(MAX_RPM)));			
 					
-					Log.d(TAG ,"volume : " + String.valueOf(volume));
+					Log.d(TAG ,"volume : " + String.valueOf(volume));				
 					
-					mp.start();		
-					mp.setVolume(volume, volume);
+					category.set(category.getItemCount()-1, "RPM", rpm);
+			        mChartView.repaint();
+			        
+			        mp.start();		
+			        
+				}else{					
+					category.set(category.getItemCount()-1, "RPM", 0);
+			        mChartView.repaint();					
 				}
+				
+				mp.setVolume(volume, volume);
+				
+				Log.d(TAG, FuelTrim.LONG_TERM_BANK_1.getBank() + " equals " + cmdName + "?");
+				
+				
 			}
 		};
 
@@ -414,8 +437,8 @@ public class MonitorActivity extends Activity {
 				queueCommands();
 				Log.d(TAG,"queueCommands();");
 
-			// run again in 0.001s
-			mHandler.postDelayed(mQueueCommands,1);
+			// run again in 0.01s
+			mHandler.postDelayed(mQueueCommands,10);
 		}
 	};
 
@@ -447,5 +470,34 @@ public class MonitorActivity extends Activity {
 		/*mServiceConnection.addJobToQueue(maf);
 		mServiceConnection.addJobToQueue(fuelLevel);
 		mServiceConnection.addJobToQueue(ltft1);*/
+	}
+	
+	private void setupDialChart(){
+		LinearLayout layout = (LinearLayout) findViewById(R.id.graph);
+		DialRenderer renderer = new DialRenderer();
+	    renderer.setChartTitleTextSize(14);
+	    renderer.setLabelsTextSize(16);
+	    renderer.setLegendTextSize(20);
+	    renderer.setMargins(new int[] {20, 30, 15, 0});
+	    
+	    SimpleSeriesRenderer r = new SimpleSeriesRenderer();
+	    r.setColor(Color.GREEN);
+	    renderer.addSeriesRenderer(r);
+	    renderer.setVisualTypes(new DialRenderer.Type[] {Type.NEEDLE});
+	    renderer.setMinValue(0);
+	    renderer.setMaxValue(8500);
+
+	    //Enable custom background color
+	    renderer.setApplyBackgroundColor(true);
+	    renderer.setBackgroundColor(Color.BLACK);
+	        
+	    //Disable dragging
+	    renderer.setPanEnabled(false);
+	        
+	    //Disable Zooming
+	    renderer.setZoomEnabled(false);
+	        
+	    mChartView = ChartFactory.getDialChartView(getApplicationContext(), category, renderer);
+	    layout.addView(mChartView, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));	
 	}
 }

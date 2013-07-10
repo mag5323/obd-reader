@@ -39,6 +39,8 @@
             android:name="eu.lighthouselabs.obd.reader.activity.ConfigActivity"
             android:label="@string/app_name" >
         </activity>
+        
+        <activity android:name="org.achartengine.GraphicalActivity" />
 
         <service
             android:name="eu.lighthouselabs.obd.reader.io.ObdGatewayService"

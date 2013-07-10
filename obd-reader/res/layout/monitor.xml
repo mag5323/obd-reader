@@ -16,7 +16,7 @@
         android:id="@+id/spd_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" 
-        android:textSize="110dp" 
+        android:textSize="100dp" 
         android:gravity="center"
         android:text="0" />
     
@@ -28,7 +28,7 @@
         android:gravity="right"
         android:text="KM/H" />
      
-    <TextView
+    <!--<TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
@@ -39,7 +39,7 @@
         android:id="@+id/rpm_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" 
-        android:textSize="110dp" 
+        android:textSize="100dp" 
         android:gravity="center"
         android:text="0" />     
      
@@ -49,25 +49,13 @@
         android:padding="5dp"
         android:textSize="20dp" 
         android:gravity="right"
-        android:text="RPM" />
-     <!-- 
-     <Button
-	    android:id="@+id/START"
+        android:text="RPM" />-->
+        
+     <LinearLayout    
+	    android:id="@+id/graph"
+	    android:orientation="horizontal"
 	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:text="START" />
-     
-     <Button
-        android:id="@+id/STOP"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="STOP" />
-     
-     <Button
-	    android:id="@+id/BACK"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:text="BACK" />
-      -->
+	    android:layout_height="fill_parent"
+	    android:layout_weight="1"
+	    android:gravity="center" />
 </LinearLayout>
