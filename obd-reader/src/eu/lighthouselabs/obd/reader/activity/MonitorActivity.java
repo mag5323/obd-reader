@@ -3,9 +3,6 @@
  */
 package eu.lighthouselabs.obd.reader.activity;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.model.CategorySeries;
@@ -21,39 +18,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.LocationManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import eu.lighthouselabs.obd.commands.SpeedObdCommand;
-import eu.lighthouselabs.obd.commands.control.CommandEquivRatioObdCommand;
 import eu.lighthouselabs.obd.commands.engine.EngineRPMObdCommand;
-import eu.lighthouselabs.obd.commands.engine.MassAirFlowObdCommand;
-import eu.lighthouselabs.obd.commands.fuel.FuelEconomyObdCommand;
 import eu.lighthouselabs.obd.commands.fuel.FuelEconomyWithMAFObdCommand;
-import eu.lighthouselabs.obd.commands.fuel.FuelLevelObdCommand;
-import eu.lighthouselabs.obd.commands.fuel.FuelTrimObdCommand;
-import eu.lighthouselabs.obd.commands.temperature.AmbientAirTemperatureObdCommand;
 import eu.lighthouselabs.obd.enums.AvailableCommandNames;
 import eu.lighthouselabs.obd.enums.FuelTrim;
 import eu.lighthouselabs.obd.enums.FuelType;
@@ -105,13 +85,13 @@ public class MonitorActivity extends Activity {
 	private double equivRatio = 1;
 	private TextView tvRpm = null, tvSpeed = null;
 
-	//set up mediaplayer
-	private MediaPlayer mp;
-	private int MAX_RPM = 16384 / 2;
-	private int rpm = 1;
-	private float volume = 0.0f;
+	//set up SoundPool
+	private SoundPool soundPool;
+	private int vehicle;
 	Bundle bundle = null;
 	private int carIndex;
+	private int rpm = 1;
+	private boolean loaded = false;
 	
 	//Dial-chart
 	private GraphicalView mChartView;
@@ -142,38 +122,31 @@ public class MonitorActivity extends Activity {
 		//create a mp3 file
 		bundle = getIntent().getExtras();
 		carIndex = bundle.getInt("carIndex");
-		try{
-			switch(carIndex){
-			case 0:
-				mp = MediaPlayer.create(this,R.raw.bentley_continental_gt);
-				break;
-			case 1:
-				mp = MediaPlayer.create(this,R.raw.mini_coopers_coupe);
-				break;
-			case 2:
-				mp = MediaPlayer.create(this,R.raw.mustang_shelby_gt500);
-				break;
-			case 3:
-				mp = MediaPlayer.create(this,R.raw.nissan_370zs);
-				break;
-			case 4:
-				mp = MediaPlayer.create(this,R.raw.porsche_gt3);
-				break;
-			}
-					
-		}
-		catch(NullPointerException e){
-			e.printStackTrace();
-		}
-		catch(Exception e){
-			e.printStackTrace();			
-		}			
+			
+		int[] vehicles = {	R.raw.bentley_continental_gt,
+							R.raw.mini_coopers_coupe,
+							R.raw.mustang_shelby_gt500,
+							R.raw.nissan_370zs,
+							R.raw.porsche_gt3  };
+		
+		soundPool = new SoundPool(1, AudioManager.STREAM_SYSTEM,1);
+		vehicle = soundPool.load(this, vehicles[carIndex], 1);		
+		Log.d(TAG,"vehicle : " + vehicle);
 		
 		//initialize Dial-chart(RPM)		
         category = new CategorySeries("RPM");
         category.add("RPM", 0);
-        setupDialChart();        
-       
+        setupDialChart();    
+        
+        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener(){
+			@Override
+			public void onLoadComplete(SoundPool soundPool, int SampleId, int status) {					
+				if(status==0){
+					loaded = true;					
+				}			
+			}
+		});    
+        
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
 				String cmdName = job.getCommand().getName();
@@ -181,40 +154,37 @@ public class MonitorActivity extends Activity {
 				
 				if (AvailableCommandNames.ENGINE_RPM.getValue().equals(cmdName)) {					
 					rpm = ((EngineRPMObdCommand)job.getCommand()).getRPM();
-					if(rpm >= 2000){
-						rpm = ((rpm+1)) / 2;	
-					}
+					rpm = (rpm+1) / 2;	
 										
 				} else if (AvailableCommandNames.SPEED.getValue().equals(
 						cmdName)) {					
 					tvSpeed.setText(cmdResult);
-					speed = ((SpeedObdCommand) job.getCommand())
-							.getMetricSpeed();					
+					speed = ((SpeedObdCommand) job.getCommand()).getMetricSpeed();					
 				}
 				
-				Log.d(TAG, "RPM : " + rpm);					
-								
+				Log.d(TAG, "RPM : " + rpm);			
+				
 				if(rpm >= 2000){
-					int temp = MAX_RPM - rpm; 
-					volume = (float) (1 - (Math.log(temp>0 ? temp:1) / Math.log(MAX_RPM)));			
 					
-					Log.d(TAG ,"volume : " + String.valueOf(volume));				
+					if(loaded){
+						soundPool.play(vehicle, 1, 1, 1, -1, 1.0f);						
+					}
 					
 					category.set(category.getItemCount()-1, "RPM", rpm);
 			        mChartView.repaint();
-			        
-			        mp.start();		
 			        
 				}else{					
 					category.set(category.getItemCount()-1, "RPM", 0);
 			        mChartView.repaint();					
 				}
 				
-				mp.setVolume(volume, volume);
+				int temp = 8192 - rpm; 					
+				float rate = (float)(2 - (Math.log(temp>0 ? temp:1)/Math.log(8192)));					
+				soundPool.setRate(vehicle, rate);
+				
+				Log.d(TAG, "rate : " + rate);
 				
 				Log.d(TAG, FuelTrim.LONG_TERM_BANK_1.getBank() + " equals " + cmdName + "?");
-				
-				
 			}
 		};
 
@@ -274,8 +244,8 @@ public class MonitorActivity extends Activity {
 		mListener = null;
 		mHandler = null;
 		
-		if (mp !=  null )  {
-			mp.release();  
+		if (soundPool !=  null )  {
+			soundPool.release();  
 		}
 	}
 
@@ -357,7 +327,7 @@ public class MonitorActivity extends Activity {
 		
 		tvRpm.setText("0");
 		tvSpeed.setText("0");
-		mp.stop();
+		soundPool.stop(vehicle);
 		
 		if (mServiceConnection.isRunning())
 			stopService(mServiceIntent);
@@ -437,7 +407,7 @@ public class MonitorActivity extends Activity {
 				queueCommands();
 				Log.d(TAG,"queueCommands();");
 
-			// run again in 0.01s
+			// run again in 0.001s
 			mHandler.postDelayed(mQueueCommands,10);
 		}
 	};
