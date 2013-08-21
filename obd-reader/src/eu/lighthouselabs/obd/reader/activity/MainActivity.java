@@ -1,16 +1,24 @@
 package eu.lighthouselabs.obd.reader.activity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import eu.lighthouselabs.obd.reader.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
-import eu.lighthouselabs.obd.reader.R;
+import android.os.Parcelable;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 
 /**
  * The main activity.
@@ -18,63 +26,44 @@ import eu.lighthouselabs.obd.reader.R;
 
 public class MainActivity extends Activity {
 	
-	private Spinner carSpin;
+	private ViewPager mPager;
+	private ObdPageAdapter mPageAdapter;
 	private Button enterBtn; 
-	private ImageView carImage;
-	private int carIndex;
-	private int[] carDraw = {R.drawable.bentley_continental_gt,
-							 R.drawable.mini_coopers_coupe,
-							 R.drawable.mustang_shelby_gt500,
-							 R.drawable.nissan370zs,
-							 R.drawable.porsche_gt3};
+	private int carIndex = 0;
+	private static int NUM_CAR_VIEWS = 5;
+	private ArrayList<View> mListViews;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		carImage = (ImageView)findViewById(R.id.car_view);
-		carSpin = (Spinner)findViewById(R.id.car_spinner);
 		enterBtn = (Button)findViewById(R.id.enter);
+		mPageAdapter = new ObdPageAdapter();
+		mPager = (ViewPager) findViewById(R.id.pager);	
+		mPager.setAdapter(mPageAdapter);
+		mListViews = new ArrayList<View>();
 		
-        ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.cars,android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        carSpin.setAdapter(adapter);
-        
-        carSpin.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+		LayoutInflater inflater = LayoutInflater.from(getBaseContext()); 
+        mListViews.add(inflater.inflate(R.layout.item1, null));
+        mListViews.add(inflater.inflate(R.layout.item2, null));
+        mListViews.add(inflater.inflate(R.layout.item3, null));
+        mListViews.add(inflater.inflate(R.layout.item4, null));
+        mListViews.add(inflater.inflate(R.layout.item5, null));
+              
+        mPager.setOnPageChangeListener(new OnPageChangeListener(){        	
+        	@Override
+            public void onPageSelected(int position) {
+                carIndex = position;
+            }           
             @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1,
-                    int arg2, long arg3) {
-                // TODO Auto-generated method stub
-            	switch(arg2){
-            	case 0:
-            		carImage.setImageResource(carDraw[0]);
-            		carIndex = 0;
-            		break;
-            	case 1:
-            		carImage.setImageResource(carDraw[1]);
-            		carIndex = 1;
-            		break;
-            	case 2:
-            		carImage.setImageResource(carDraw[2]);
-            		carIndex = 2;
-            		break;
-            	case 3:
-            		carImage.setImageResource(carDraw[3]);
-            		carIndex = 3;
-            		break;
-            	case 4:
-            		carImage.setImageResource(carDraw[4]);
-            		carIndex = 4;
-            		break;
-            	}	
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
             }
- 
+                     
             @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
- 
+            public void onPageScrollStateChanged(int arg0) {
+                //mIndicator.setCurrentItem(myAdapter.getCount()-1);
             }
- 
         });
         
         enterBtn.setOnClickListener(new Button.OnClickListener(){
@@ -86,8 +75,32 @@ public class MainActivity extends Activity {
 				intent.setClass(MainActivity.this, MonitorActivity.class);
 				intent.putExtras(bundle);
 				startActivity(intent);
-			}		
+			}
 		});
+	}
+	
+	protected class ObdPageAdapter extends PagerAdapter {   
+		@Override
+		public Object instantiateItem(View view, int position) {
+				((ViewPager)view).addView(mListViews.get(position));
+				return mListViews.get(position);
+		}
+		
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			((ViewPager)container).removeView(mListViews.get(position));
+		}
+		
+		 @Override
+		public int getCount() {
+	        return NUM_CAR_VIEWS;
+	    }
+		
+		@Override
+		public boolean isViewFromObject(View view, Object object) {
+			return (view==object);
+		}
+		
 	}
 	
 	@Override

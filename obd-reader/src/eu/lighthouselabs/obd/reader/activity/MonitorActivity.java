@@ -325,7 +325,6 @@ public class MonitorActivity extends Activity {
 	private void stopLiveData() {
 		Log.d(TAG, "Stopping live data..");
 		
-		tvRpm.setText("0");
 		tvSpeed.setText("0");
 		soundPool.stop(vehicle);
 		
@@ -408,7 +407,7 @@ public class MonitorActivity extends Activity {
 				Log.d(TAG,"queueCommands();");
 
 			// run again in 0.001s
-			mHandler.postDelayed(mQueueCommands,10);
+			mHandler.postDelayed(mQueueCommands,1000);
 		}
 	};
 
