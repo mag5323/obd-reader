@@ -7,6 +7,7 @@ import eu.lighthouselabs.obd.reader.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -30,7 +31,6 @@ public class MainActivity extends Activity {
 	private ObdPageAdapter mPageAdapter;
 	private Button enterBtn; 
 	private int carIndex = 0;
-	private static int NUM_CAR_VIEWS = 5;
 	private ArrayList<View> mListViews;
 	
 	@Override
@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
 		mPageAdapter = new ObdPageAdapter();
 		mPager = (ViewPager) findViewById(R.id.pager);	
 		mPager.setAdapter(mPageAdapter);
-		mListViews = new ArrayList<View>();
+		mListViews = new ArrayList<View>();		  
 		
 		LayoutInflater inflater = LayoutInflater.from(getBaseContext()); 
         mListViews.add(inflater.inflate(R.layout.item1, null));
@@ -50,19 +50,21 @@ public class MainActivity extends Activity {
         mListViews.add(inflater.inflate(R.layout.item3, null));
         mListViews.add(inflater.inflate(R.layout.item4, null));
         mListViews.add(inflater.inflate(R.layout.item5, null));
+        
+        mPager.setCurrentItem(mListViews.size()*100);
               
         mPager.setOnPageChangeListener(new OnPageChangeListener(){        	
         	@Override
             public void onPageSelected(int position) {
                 carIndex = position;
-            }           
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-            }
+            }          
                      
             @Override
-            public void onPageScrollStateChanged(int arg0) {
-                //mIndicator.setCurrentItem(myAdapter.getCount()-1);
+            public void onPageScrollStateChanged(int state) {
+            }
+            
+            @Override
+            public void onPageScrolled(int position, float offset, int offsetPixels) {            	
             }
         });
         
@@ -70,7 +72,7 @@ public class MainActivity extends Activity {
 			@Override
             public void onClick(View v) {
 				Bundle bundle = new Bundle();
-				bundle.putInt("carIndex",carIndex);
+				bundle.putInt("carIndex",carIndex % 5);
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, MonitorActivity.class);
 				intent.putExtras(bundle);
@@ -81,19 +83,19 @@ public class MainActivity extends Activity {
 	
 	protected class ObdPageAdapter extends PagerAdapter {   
 		@Override
-		public Object instantiateItem(View view, int position) {
-				((ViewPager)view).addView(mListViews.get(position));
-				return mListViews.get(position);
+		public Object instantiateItem(ViewGroup container, int position) {
+				((ViewPager)container).addView(mListViews.get(position % mListViews.size()), 0);  
+	            return mListViews.get(position % mListViews.size());  
 		}
 		
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
-			((ViewPager)container).removeView(mListViews.get(position));
+			((ViewPager)container).removeView(mListViews.get(position % mListViews.size())); 
 		}
 		
 		 @Override
 		public int getCount() {
-	        return NUM_CAR_VIEWS;
+	        return 1000;
 	    }
 		
 		@Override

@@ -8,7 +8,7 @@
     <ImageView
         android:id="@+id/car_view"
         android:layout_width="wrap_content"
-        android:layout_height="300dp"
+        android:layout_height="200dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/bentley_continental_gt"
         android:scaleType="fitCenter" />
@@ -17,7 +17,8 @@
         android:id="@+id/album_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="bentley_continental_gt"
+        android:layout_gravity="bottom|center_horizontal"
+        android:text="Bentley Continental Gt"
         android:textColor="#ffffff"
         android:textSize="30sp" />
 

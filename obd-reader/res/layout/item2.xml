@@ -8,7 +8,7 @@
     <ImageView   
         android:id="@+id/car_view"  
         android:layout_width="wrap_content"  
-        android:layout_height="300dp"  
+        android:layout_height="200dp"  
         android:layout_marginTop="25dp"
         android:scaleType="fitCenter"
         android:background="@drawable/mini_coopers_coupe"  />
@@ -20,6 +20,6 @@
         android:layout_gravity="bottom|center_horizontal"
         android:textColor="#ffffff"
         android:textSize="30sp" 
-        android:text="mini_coopers_coupe"  />
+        android:text="Mini Coopers Coupe"  />
   
 </LinearLayout>  
