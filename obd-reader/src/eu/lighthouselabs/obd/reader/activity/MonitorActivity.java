@@ -30,6 +30,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import eu.lighthouselabs.obd.commands.SpeedObdCommand;
 import eu.lighthouselabs.obd.commands.engine.EngineRPMObdCommand;
@@ -442,7 +443,7 @@ public class MonitorActivity extends Activity {
 	}
 	
 	private void setupDialChart(){
-		LinearLayout layout = (LinearLayout) findViewById(R.id.graph);
+		RelativeLayout layout = (RelativeLayout) findViewById(R.id.graph);
 		DialRenderer renderer = new DialRenderer();
 	    renderer.setChartTitleTextSize(14);
 	    renderer.setLabelsTextSize(16);
@@ -450,11 +451,22 @@ public class MonitorActivity extends Activity {
 	    renderer.setMargins(new int[] {20, 30, 15, 0});
 	    
 	    SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-	    r.setColor(Color.GREEN);
+	    r.setColor(Color.rgb(205,85,85));
 	    renderer.addSeriesRenderer(r);
 	    renderer.setVisualTypes(new DialRenderer.Type[] {Type.NEEDLE});
+	    	    
+	    //標題
+	    renderer.setLegendTextSize(30f);
+	    
+	    //圖表大小
+	    renderer.setScale(1.25f);
+	    
+	    //刻度
+	    renderer.setMajorTicksSpacing(1);
+	    renderer.setMinorTicksSpacing(0.5);
+	    
 	    renderer.setMinValue(0);
-	    renderer.setMaxValue(8500);
+	    renderer.setMaxValue(8);
 
 	    //Enable custom background color
 	    renderer.setApplyBackgroundColor(true);

@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>  
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent" 
     android:background="#000000" 
-    android:orientation="vertical" >  
+    android:orientation="vertical"  >  
   
     <ImageView   
         android:id="@+id/car_view"  
         android:layout_width="wrap_content"  
         android:layout_height="200dp"  
-        android:layout_marginTop="25dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:scaleType="fitCenter"
+        android:layout_centerHorizontal="true"
         android:background="@drawable/porsche_gt3" />  
         
     <TextView
         android:id="@+id/album_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
+        android:layout_below="@+id/car_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
         android:textColor="#ffffff"
-        android:textSize="30sp" 
-        android:text="Porsche Gt3"  />
+        android:textSize="20sp" 
+        android:text="Gt3"  />
   
-</LinearLayout>  
+</RelativeLayout>  

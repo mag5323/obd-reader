@@ -1,61 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/vehicle_view"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
-   
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:textSize="25dp" 
-        android:text="時速:" />
-    
+    android:layout_marginTop="25dp"
+	android:layout_marginLeft="25dp"
+	android:layout_marginRight="25dp"
+	android:layout_marginBottom="25dp"
+    android:orientation="horizontal" >
+      
+     <RelativeLayout    
+	    android:id="@+id/graph"
+	    android:layout_width="275dp"
+	    android:layout_height="275dp"
+	    android:layout_alignParentLeft="true" />
+     
      <TextView
         android:id="@+id/spd_text"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content" 
+        android:layout_marginLeft="50dp"
         android:textSize="100dp" 
-        android:gravity="center"
+        android:layout_toLeftOf="@+id/kmh_text"
+        android:layout_centerVertical="true"
         android:text="0" />
     
      <TextView
-        android:layout_width="fill_parent"
+        android:id="@+id/kmh_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:textSize="20dp" 
-        android:gravity="right"
-        android:text="KM/H" />
+        android:layout_below="@+id/spd_text"
+        android:layout_alignParentRight="true"
+        android:text="KM/H" />        
      
-    <!--<TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:textSize="25dp"
-        android:text="轉速:" />
-    
-     <TextView
-        android:id="@+id/rpm_text"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" 
-        android:textSize="100dp" 
-        android:gravity="center"
-        android:text="0" />     
-     
-     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:textSize="20dp" 
-        android:gravity="right"
-        android:text="RPM" />-->
-        
-     <LinearLayout    
-	    android:id="@+id/graph"
-	    android:orientation="horizontal"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:layout_weight="1"
-	    android:gravity="center" />
-</LinearLayout>
+</RelativeLayout>
