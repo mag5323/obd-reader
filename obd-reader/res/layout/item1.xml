@@ -8,22 +8,11 @@
     <ImageView
         android:id="@+id/car_view"
         android:layout_width="wrap_content"
-        android:layout_height="200dp"
+        android:layout_height="250dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_centerHorizontal="true"  
         android:background="@drawable/bentley_continental_gt"
         android:scaleType="fitCenter" />
-
-    <TextView
-        android:id="@+id/album_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/car_view"
-        android:layout_centerHorizontal="true"    
-        android:layout_marginTop="25dp"   
-        android:textColor="#ffffff"
-        android:textSize="20sp" 
-        android:text="Continental Gt" />
 
 </RelativeLayout>

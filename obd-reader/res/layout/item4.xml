@@ -8,20 +8,11 @@
     <ImageView   
         android:id="@+id/car_view"  
         android:layout_width="wrap_content"  
-        android:layout_height="200dp"  
+        android:layout_height="250dp"  
         android:scaleType="fitCenter"  
         android:layout_centerHorizontal="true"
         android:background="@drawable/nissan370zs" />   
         
-    <TextView
-        android:id="@+id/album_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/car_view"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-        android:textColor="#ffffff"
-        android:textSize="20sp" 
-        android:text="370zs"  />
+  
   
 </RelativeLayout>  
