@@ -3,13 +3,13 @@
  */
 package eu.lighthouselabs.obd.reader.activity;
 
-import org.achartengine.ChartFactory;
+/*import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.model.CategorySeries;
 import org.achartengine.renderer.DialRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
 import org.achartengine.renderer.DialRenderer.Type;
-
+import android.graphics.Color;*/
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -17,7 +17,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -95,8 +94,8 @@ public class MonitorActivity extends Activity {
 	private boolean loaded = false;
 	
 	//Dial-chart
-	private GraphicalView mChartView;
-	private CategorySeries category;
+	DialView dv;
+	RelativeLayout mLayout;
 	
 	public void updateTextView(final TextView view, final String txt) {
 		new Handler().post(new Runnable() {
@@ -110,13 +109,12 @@ public class MonitorActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		/*
-		 * TODO clean-up this upload thing
-		 * 
-		 * ExceptionHandler.register(this,
-		 * "http://www.whidbeycleaning.com/droid/server.php");
-		 */
 		setContentView(R.layout.monitor);
+		
+		//add DialView to RelativeLayout
+		mLayout = (RelativeLayout)findViewById(R.id.vehicle_view);
+		dv = new DialView(this, null);		
+		mLayout.addView(dv);
 		
 		tvSpeed = (TextView) findViewById(R.id.spd_text);
 		
@@ -134,11 +132,6 @@ public class MonitorActivity extends Activity {
 		vehicle = soundPool.load(this, vehicles[carIndex], 1);		
 		Log.d(TAG,"vehicle : " + vehicle);
 		
-		//initialize Dial-chart(RPM)		
-        category = new CategorySeries("RPM");
-        category.add("RPM", 0);
-        setupDialChart();    
-        
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener(){
 			@Override
 			public void onLoadComplete(SoundPool soundPool, int SampleId, int status) {					
@@ -171,12 +164,12 @@ public class MonitorActivity extends Activity {
 						soundPool.play(vehicle, 1, 1, 1, -1, 1.0f);						
 					}
 					
-					category.set(category.getItemCount()-1, "RPM", rpm);
-			        mChartView.repaint();
+					 dv.setRPM(rpm);
+					 dv.invalidate();
 			        
 				}else{					
-					category.set(category.getItemCount()-1, "RPM", 0);
-			        mChartView.repaint();					
+					dv.setRPM(0);
+					dv.invalidate();
 				}
 				
 				int temp = 8192 - rpm; 					
@@ -360,7 +353,7 @@ public class MonitorActivity extends Activity {
 		MenuItem startItem = menu.findItem(START_LIVE_DATA);
 		MenuItem stopItem = menu.findItem(STOP_LIVE_DATA);
 		MenuItem settingsItem = menu.findItem(SETTINGS);
-		//MenuItem commandItem = menu.findItem(COMMAND_ACTIVITY);
+		MenuItem commandItem = menu.findItem(COMMAND_ACTIVITY);
 
 		// validate if preRequisites are satisfied.
 		if (preRequisites) {
@@ -368,18 +361,18 @@ public class MonitorActivity extends Activity {
 				startItem.setEnabled(false);
 				stopItem.setEnabled(true);
 				settingsItem.setEnabled(false);
-				//commandItem.setEnabled(false);
+				commandItem.setEnabled(false);
 			} else {
 				stopItem.setEnabled(false);
 				startItem.setEnabled(true);
 				settingsItem.setEnabled(true);
-				//commandItem.setEnabled(false);
+				commandItem.setEnabled(false);
 			}
 		} else {
 			startItem.setEnabled(false);
 			stopItem.setEnabled(false);
 			settingsItem.setEnabled(false);
-			//commandItem.setEnabled(false);
+			commandItem.setEnabled(false);
 		}
 
 		return true;
@@ -397,9 +390,7 @@ public class MonitorActivity extends Activity {
 			if (speed > 1 && maf > 1 && ltft != 0) {
 				FuelEconomyWithMAFObdCommand fuelEconCmd = new FuelEconomyWithMAFObdCommand(
 						FuelType.DIESEL, speed, maf, ltft, false /* TODO */);
-				//TextView tvMpg = (TextView) findViewById(R.id.fuel_econ_text);
 				String liters100km = String.format("%.2f", fuelEconCmd.getLitersPer100Km());
-				//tvMpg.setText("" + liters100km);
 				Log.d(TAG, "FUELECON:" + liters100km);
 			}
 
@@ -440,45 +431,5 @@ public class MonitorActivity extends Activity {
 		/*mServiceConnection.addJobToQueue(maf);
 		mServiceConnection.addJobToQueue(fuelLevel);
 		mServiceConnection.addJobToQueue(ltft1);*/
-	}
-	
-	private void setupDialChart(){
-		RelativeLayout layout = (RelativeLayout) findViewById(R.id.graph);
-		DialRenderer renderer = new DialRenderer();
-	    renderer.setChartTitleTextSize(14);
-	    renderer.setLabelsTextSize(16);
-	    renderer.setLegendTextSize(20);
-	    renderer.setMargins(new int[] {20, 30, 15, 0});
-	    
-	    SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-	    r.setColor(Color.rgb(205,85,85));
-	    renderer.addSeriesRenderer(r);
-	    renderer.setVisualTypes(new DialRenderer.Type[] {Type.NEEDLE});
-	    	    
-	    //標題
-	    renderer.setLegendTextSize(30f);
-	    
-	    //圖表大小
-	    renderer.setScale(1.25f);
-	    
-	    //刻度
-	    renderer.setMajorTicksSpacing(1);
-	    renderer.setMinorTicksSpacing(0.5);
-	    
-	    renderer.setMinValue(0);
-	    renderer.setMaxValue(8);
-
-	    //Enable custom background color
-	    renderer.setApplyBackgroundColor(true);
-	    renderer.setBackgroundColor(Color.BLACK);
-	        
-	    //Disable dragging
-	    renderer.setPanEnabled(false);
-	        
-	    //Disable Zooming
-	    renderer.setZoomEnabled(false);
-	        
-	    mChartView = ChartFactory.getDialChartView(getApplicationContext(), category, renderer);
-	    layout.addView(mChartView, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));	
 	}
 }
