@@ -38,7 +38,8 @@ public class DialView extends View {
 		
 		angle = (float) ( this.rpm / RPMperGrad * 15 );
 		
-		canvas.translate(max, max);
+		//canvas.translate(max,max);
+		canvas.translate(200,200);
 		canvas.save();
 		canvas.rotate(angle, width/2, height/2);
 	    canvas.drawBitmap(bitmapOrg, 0, 0, null);

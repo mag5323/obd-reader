@@ -2,14 +2,6 @@
  * TODO put header
  */
 package eu.lighthouselabs.obd.reader.activity;
-
-/*import org.achartengine.ChartFactory;
-import org.achartengine.GraphicalView;
-import org.achartengine.model.CategorySeries;
-import org.achartengine.renderer.DialRenderer;
-import org.achartengine.renderer.SimpleSeriesRenderer;
-import org.achartengine.renderer.DialRenderer.Type;
-import android.graphics.Color;*/
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -158,22 +150,12 @@ public class MonitorActivity extends Activity {
 				
 				Log.d(TAG, "RPM : " + rpm);			
 				
-				if(rpm >= 2000){
-					
-					if(loaded){
-						soundPool.play(vehicle, 1, 1, 1, -1, 1.0f);						
-					}
-					
-					 dv.setRPM(rpm);
-					 dv.invalidate();
-			        
-				}else{					
-					dv.setRPM(0);
-					dv.invalidate();
-				}
+				dv.setRPM(rpm);
+				dv.invalidate();
+				
 				
 				int temp = 8192 - rpm; 					
-				float rate = (float)(2 - (Math.log(temp>0 ? temp:1)/Math.log(8192)));					
+				float rate = (float)(1.5 - (Math.log(temp>0 ? temp:1)/Math.log(8192)));					
 				soundPool.setRate(vehicle, rate);
 				
 				Log.d(TAG, "rate : " + rate);
@@ -307,6 +289,7 @@ public class MonitorActivity extends Activity {
 		if (!mServiceConnection.isRunning()) {
 			Log.d(TAG, "Service is not running. Going to start it..");
 			startService(mServiceIntent);
+			soundPool.play(vehicle, 1, 1, 1, -1, 0.5f);
 		}
 
 		// start command execution
@@ -399,7 +382,7 @@ public class MonitorActivity extends Activity {
 				Log.d(TAG,"queueCommands();");
 
 			// run again in 0.001s
-			mHandler.postDelayed(mQueueCommands,1000);
+			mHandler.postDelayed(mQueueCommands,1);
 		}
 	};
 
@@ -407,29 +390,10 @@ public class MonitorActivity extends Activity {
 	 * 
 	 */
 	private void queueCommands() {
-		/*final ObdCommandJob airTemp = new ObdCommandJob(
-				new AmbientAirTemperatureObdCommand());*/
 		final ObdCommandJob speed = new ObdCommandJob(new SpeedObdCommand());
-		/*final ObdCommandJob fuelEcon = new ObdCommandJob(
-				new FuelEconomyObdCommand());*/
 		final ObdCommandJob rpm = new ObdCommandJob(new EngineRPMObdCommand());
-		/*final ObdCommandJob maf = new ObdCommandJob(new MassAirFlowObdCommand());
-		final ObdCommandJob fuelLevel = new ObdCommandJob(
-				new FuelLevelObdCommand());
-		final ObdCommandJob ltft1 = new ObdCommandJob(new FuelTrimObdCommand(
-				FuelTrim.LONG_TERM_BANK_1));
-		final ObdCommandJob ltft2 = new ObdCommandJob(new FuelTrimObdCommand(
-				FuelTrim.LONG_TERM_BANK_2));
-		final ObdCommandJob stft1 = new ObdCommandJob(new FuelTrimObdCommand(
-				FuelTrim.SHORT_TERM_BANK_1));
-		final ObdCommandJob stft2 = new ObdCommandJob(new FuelTrimObdCommand(
-				FuelTrim.SHORT_TERM_BANK_2));
-		final ObdCommandJob equiv = new ObdCommandJob(new CommandEquivRatioObdCommand());*/
 
 		mServiceConnection.addJobToQueue(speed);
 		mServiceConnection.addJobToQueue(rpm);
-		/*mServiceConnection.addJobToQueue(maf);
-		mServiceConnection.addJobToQueue(fuelLevel);
-		mServiceConnection.addJobToQueue(ltft1);*/
 	}
 }
