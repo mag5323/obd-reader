@@ -13,8 +13,8 @@ import android.view.View;
 public class DialView extends View {
 
 	Bitmap bitmapOrg;
-	int width, height, rpm;
-	int RPMperGrad = 8000/12;
+	int width, height, rpm, rpmMax=2080;
+	int RPMperGrad = rpmMax/12;
 	float angle;
 	
 	public DialView(Context context, AttributeSet attrs) {

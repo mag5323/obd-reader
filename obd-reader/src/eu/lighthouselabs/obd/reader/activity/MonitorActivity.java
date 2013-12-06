@@ -19,8 +19,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import eu.lighthouselabs.obd.commands.SpeedObdCommand;
@@ -83,6 +81,7 @@ public class MonitorActivity extends Activity {
 	Bundle bundle = null;
 	private int carIndex;
 	private int rpm = 1;
+	private int rpmMax = 2080; //8192
 	private boolean loaded = false;
 	
 	//Dial-chart
@@ -138,6 +137,10 @@ public class MonitorActivity extends Activity {
 				String cmdName = job.getCommand().getName();
 				String cmdResult = job.getCommand().getFormattedResult();
 				
+				if (cmdResult=="NODATA") {
+					cmdResult = "0";
+				}
+				
 				if (AvailableCommandNames.ENGINE_RPM.getValue().equals(cmdName)) {					
 					rpm = ((EngineRPMObdCommand)job.getCommand()).getRPM();
 					rpm = (rpm+1) / 2;	
@@ -154,8 +157,11 @@ public class MonitorActivity extends Activity {
 				dv.invalidate();
 				
 				
-				int temp = 8192 - rpm; 					
-				float rate = (float)(1.5 - (Math.log(temp>0 ? temp:1)/Math.log(8192)));					
+				int temp = rpmMax - rpm; 					
+				float rate = (float)(2.0 - (Math.log(temp>0 ? temp:1)/Math.log(rpmMax)));	
+				
+				Log.d("RPM : ", rpm+"");
+				
 				soundPool.setRate(vehicle, rate);
 				
 				Log.d(TAG, "rate : " + rate);
@@ -289,11 +295,13 @@ public class MonitorActivity extends Activity {
 		if (!mServiceConnection.isRunning()) {
 			Log.d(TAG, "Service is not running. Going to start it..");
 			startService(mServiceIntent);
-			soundPool.play(vehicle, 1, 1, 1, -1, 0.5f);
 		}
 
 		// start command execution
 		mHandler.post(mQueueCommands);
+		if (loaded) {
+			soundPool.play(vehicle, 1, 1, 1, -1, 0.5f);
+		}
 
 		// screen won't turn off until wakeLock.release()
 		wakeLock.acquire();
@@ -381,8 +389,9 @@ public class MonitorActivity extends Activity {
 				queueCommands();
 				Log.d(TAG,"queueCommands();");
 
-			// run again in 0.001s
-			mHandler.postDelayed(mQueueCommands,1);
+			// run zagain in 0.001s
+			//mHandler.postDelayed(mQueueCommands,10);
+			mHandler.postDelayed(mQueueCommands,1000);
 		}
 	};
 
