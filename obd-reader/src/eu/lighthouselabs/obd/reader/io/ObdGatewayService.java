@@ -224,7 +224,7 @@ public class ObdGatewayService extends Service {
 		 * command.run(), command.getResult() and validate the result.
 		 */
 		queueJob(new ObdCommandJob(new EchoOffObdCommand()));
-		queueJob(new ObdCommandJob(new LineFeedOffObdCommand()));
+		//queueJob(new ObdCommandJob(new LineFeedOffObdCommand()));
 		queueJob(new ObdCommandJob(new TimeoutObdCommand(62)));
 
 		// For now set protocol to AUTO
@@ -232,7 +232,7 @@ public class ObdGatewayService extends Service {
 		        ObdProtocols.AUTO)));
 		
 		// Job for returning dummy data
-		queueJob(new ObdCommandJob(new AmbientAirTemperatureObdCommand()));
+		//queueJob(new ObdCommandJob(new AmbientAirTemperatureObdCommand()));
 
 		Log.d(TAG, "Initialization jobs queued.");
 

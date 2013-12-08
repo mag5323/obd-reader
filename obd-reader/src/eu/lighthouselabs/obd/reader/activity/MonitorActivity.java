@@ -145,8 +145,7 @@ public class MonitorActivity extends Activity {
 					rpm = ((EngineRPMObdCommand)job.getCommand()).getRPM();
 					rpm = (rpm+1) / 2;	
 										
-				} else if (AvailableCommandNames.SPEED.getValue().equals(
-						cmdName)) {					
+				} else if (AvailableCommandNames.SPEED.getValue().equals(cmdName)) {					
 					tvSpeed.setText(cmdResult);
 					speed = ((SpeedObdCommand) job.getCommand()).getMetricSpeed();					
 				}
@@ -166,7 +165,6 @@ public class MonitorActivity extends Activity {
 				
 				Log.d(TAG, "rate : " + rate);
 				
-				Log.d(TAG, FuelTrim.LONG_TERM_BANK_1.getBank() + " equals " + cmdName + "?");
 			}
 		};
 
@@ -319,6 +317,8 @@ public class MonitorActivity extends Activity {
 		// remove runnable
 		mHandler.removeCallbacks(mQueueCommands);		
 		releaseWakeLockIfHeld();
+		soundPool.stop(vehicle);
+		soundPool.release();
 	}
 
 	protected Dialog onCreateDialog(int id) {
@@ -380,7 +380,7 @@ public class MonitorActivity extends Activity {
 			Log.d(TAG, "SPD:" + speed + ", MAF:" + maf + ", LTFT:" + ltft);
 			if (speed > 1 && maf > 1 && ltft != 0) {
 				FuelEconomyWithMAFObdCommand fuelEconCmd = new FuelEconomyWithMAFObdCommand(
-						FuelType.DIESEL, speed, maf, ltft, false /* TODO */);
+						FuelType.DIESEL, speed, maf, ltft, false );
 				String liters100km = String.format("%.2f", fuelEconCmd.getLitersPer100Km());
 				Log.d(TAG, "FUELECON:" + liters100km);
 			}
@@ -389,9 +389,8 @@ public class MonitorActivity extends Activity {
 				queueCommands();
 				Log.d(TAG,"queueCommands();");
 
-			// run zagain in 0.001s
-			//mHandler.postDelayed(mQueueCommands,10);
-			mHandler.postDelayed(mQueueCommands,1000);
+			// run again in 0.001s
+			mHandler.postDelayed(mQueueCommands,500);
 		}
 	};
 

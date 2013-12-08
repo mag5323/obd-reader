@@ -2,8 +2,8 @@ package eu.lighthouselabs.obd.reader.activity;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import eu.lighthouselabs.obd.reader.R;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
