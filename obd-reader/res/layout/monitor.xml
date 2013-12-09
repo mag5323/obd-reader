@@ -15,6 +15,13 @@
 	    android:layout_height="275dp"
 	    android:layout_alignParentLeft="true" />
      
+     <ImageView
+        android:id="@+id/tick"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:adjustViewBounds="true"
+	    android:src="@drawable/tick" />
+     
      <TextView
         android:id="@+id/spd_text"
         android:layout_width="wrap_content"

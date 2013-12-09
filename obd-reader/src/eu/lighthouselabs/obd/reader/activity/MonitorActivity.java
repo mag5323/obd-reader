@@ -2,6 +2,8 @@
  * TODO put header
  */
 package eu.lighthouselabs.obd.reader.activity;
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -19,6 +21,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import eu.lighthouselabs.obd.commands.SpeedObdCommand;
@@ -81,8 +86,9 @@ public class MonitorActivity extends Activity {
 	Bundle bundle = null;
 	private int carIndex;
 	private int rpm = 1;
-	private int rpmMax = 2080; //8192
+	private int rpmMax = 8192; //2080
 	private boolean loaded = false;
+	ArrayList<Float> preAngle;
 	
 	//Dial-chart
 	DialView dv;
@@ -104,8 +110,8 @@ public class MonitorActivity extends Activity {
 		
 		//add DialView to RelativeLayout
 		mLayout = (RelativeLayout)findViewById(R.id.vehicle_view);
-		dv = new DialView(this, null);		
-		mLayout.addView(dv);
+		//dv = new DialView(this, null);		
+		//mLayout.addView(dv);
 		
 		tvSpeed = (TextView) findViewById(R.id.spd_text);
 		
@@ -142,27 +148,51 @@ public class MonitorActivity extends Activity {
 				}
 				
 				if (AvailableCommandNames.ENGINE_RPM.getValue().equals(cmdName)) {					
-					rpm = ((EngineRPMObdCommand)job.getCommand()).getRPM();
+					rpm = ((EngineRPMObdCommand) job.getCommand()).getRPM();
 					rpm = (rpm+1) / 2;	
 										
 				} else if (AvailableCommandNames.SPEED.getValue().equals(cmdName)) {					
 					tvSpeed.setText(cmdResult);
 					speed = ((SpeedObdCommand) job.getCommand()).getMetricSpeed();					
+				}				
+				
+				/*dv.setRPM(rpm);
+				dv.setpreAngle(rpm);
+				dv.invalidate();*/
+				
+
+				ImageView img = (ImageView) findViewById(R.id.tick);
+				preAngle = new ArrayList<Float>();
+				float fromAngle = 0;
+				
+				float angle =  rpm / 8192.0f / 12.0f * 15.0f ;		
+				Log.d("angle", angle+"");
+				
+				preAngle.add(angle);
+				if (preAngle.size()>2){
+					fromAngle =  preAngle.get(preAngle.size()-2);				
 				}
 				
-				Log.d(TAG, "RPM : " + rpm);			
+				Log.d("fromAngle", fromAngle+"");
 				
-				dv.setRPM(rpm);
-				dv.invalidate();
-				
+				Animation anim = new RotateAnimation(0, angle, 208/2, 74/2);  
+		        anim.setDuration(1000);  
+		        img.setAnimation(anim);
+		        anim.startNow();
+		        
+		        try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 				int temp = rpmMax - rpm; 					
-				float rate = (float)(2.0 - (Math.log(temp>0 ? temp:1)/Math.log(rpmMax)));	
-				
-				Log.d("RPM : ", rpm+"");
+				float rate = (float)(1.5 - (Math.log(temp>0 ? temp:1)/Math.log(rpmMax)));	
 				
 				soundPool.setRate(vehicle, rate);
 				
+				Log.d(TAG, "RPM : " + rpm);	
 				Log.d(TAG, "rate : " + rate);
 				
 			}
