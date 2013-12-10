@@ -3,6 +3,7 @@
  */
 package eu.lighthouselabs.obd.reader.activity;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -88,7 +89,8 @@ public class MonitorActivity extends Activity {
 	private int rpm = 1;
 	private int rpmMax = 8192; //2080
 	private boolean loaded = false;
-	ArrayList<Float> preAngle;
+	Stack<Float> preAngle = new Stack<Float>();
+	ImageView img;
 	
 	//Dial-chart
 	DialView dv;
@@ -112,7 +114,7 @@ public class MonitorActivity extends Activity {
 		mLayout = (RelativeLayout)findViewById(R.id.vehicle_view);
 		//dv = new DialView(this, null);		
 		//mLayout.addView(dv);
-		
+		img = (ImageView) findViewById(R.id.tick);
 		tvSpeed = (TextView) findViewById(R.id.spd_text);
 		
 		//create a mp3 file
@@ -136,7 +138,12 @@ public class MonitorActivity extends Activity {
 					loaded = true;					
 				}			
 			}
-		});    
+		});  
+        
+        Animation anim = new RotateAnimation(0, 90, 4, 0);  
+        anim.setDuration(0);  
+        img.setAnimation(anim);
+        anim.startNow();
         
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
@@ -160,22 +167,19 @@ public class MonitorActivity extends Activity {
 				dv.setpreAngle(rpm);
 				dv.invalidate();*/
 				
-
-				ImageView img = (ImageView) findViewById(R.id.tick);
-				preAngle = new ArrayList<Float>();
 				float fromAngle = 0;
 				
-				float angle =  rpm / 8192.0f / 12.0f * 15.0f ;		
+				float angle =  rpm / 8192.0f * 180.0f ;		
 				Log.d("angle", angle+"");
 				
-				preAngle.add(angle);
-				if (preAngle.size()>2){
-					fromAngle =  preAngle.get(preAngle.size()-2);				
+				preAngle.push(angle);
+				if (preAngle.size()>1){
+					fromAngle =  preAngle.get(preAngle.size()-2);
 				}
 				
-				Log.d("fromAngle", fromAngle+"");
+				Log.d("fromAngle, toAngle", fromAngle+", "+angle);
 				
-				Animation anim = new RotateAnimation(0, angle, 208/2, 74/2);  
+				Animation anim = new RotateAnimation(fromAngle, angle, 4, 0);  
 		        anim.setDuration(1000);  
 		        img.setAnimation(anim);
 		        anim.startNow();
