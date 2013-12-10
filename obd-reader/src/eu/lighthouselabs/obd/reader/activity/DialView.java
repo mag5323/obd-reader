@@ -31,7 +31,7 @@ public class DialView extends View {
 		preAngle = new ArrayList<Float>();
 		
 		if(!isInEditMode()){
-			bitmapOrg = BitmapFactory.decodeResource(getResources(),R.drawable.tick).copy(Bitmap.Config.ARGB_8888,  true );
+			bitmapOrg = BitmapFactory.decodeResource(getResources(),R.drawable.tick2).copy(Bitmap.Config.ARGB_8888,  true );
 			width = bitmapOrg.getWidth();
 			height = bitmapOrg.getHeight();			
 		} 
