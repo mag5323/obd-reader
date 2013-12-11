@@ -140,10 +140,10 @@ public class MonitorActivity extends Activity {
 			}
 		});  
         
-        Animation anim = new RotateAnimation(0, 90, 4, 0);  
+        /*Animation anim = new RotateAnimation(0, 90, 4, 0);  
         anim.setDuration(0);  
         img.setAnimation(anim);
-        anim.startNow();
+        anim.startNow();*/
         
 		mListener = new IPostListener() {
 			public void stateUpdate(ObdCommandJob job) {
@@ -169,7 +169,7 @@ public class MonitorActivity extends Activity {
 				
 				float fromAngle = 0;
 				
-				float angle =  rpm / 8192.0f * 180.0f ;		
+				float angle =  rpm / 8192.0f * 195.0f ;		
 				Log.d("angle", angle+"");
 				
 				preAngle.push(angle);
@@ -179,7 +179,7 @@ public class MonitorActivity extends Activity {
 				
 				Log.d("fromAngle, toAngle", fromAngle+", "+angle);
 				
-				Animation anim = new RotateAnimation(fromAngle, angle, 4, 0);  
+				Animation anim = new RotateAnimation(fromAngle, angle, 101*2, 35);
 		        anim.setDuration(1000);  
 		        img.setAnimation(anim);
 		        anim.startNow();

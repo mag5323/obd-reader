@@ -7,7 +7,7 @@
 	android:layout_marginLeft="25dp"
 	android:layout_marginRight="25dp"
 	android:layout_marginBottom="25dp"
-    android:orientation="horizontal" >
+    android:orientation="horizontal">
       
      <!-- <RelativeLayout    
 	    android:id="@+id/graph"
@@ -16,13 +16,20 @@
 	    android:layout_alignParentLeft="true" /> -->
      
      <ImageView
+        android:layout_marginTop="30dp"
+	    android:layout_marginLeft="30dp"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:src="@drawable/rpmbg" />
+     
+     <ImageView
         android:id="@+id/tick"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:layout_marginTop="150dp"
-	    android:layout_marginLeft="150dp"
+	    android:layout_marginTop="160dp"
+	    android:layout_marginLeft="80dp"
 	    android:adjustViewBounds="true"
-	    android:src="@drawable/tick2" />
+	    android:src="@drawable/alltick" />
      
      <TextView
         android:id="@+id/spd_text"
