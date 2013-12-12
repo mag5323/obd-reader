@@ -86,15 +86,11 @@ public class MonitorActivity extends Activity {
 	private int vehicle;
 	Bundle bundle = null;
 	private int carIndex;
-	private int rpm = 1;
-	private int rpmMax = 8192; //2080
+	private float rpm = 1;
+	private float rpmMax = 2080; //2080
 	private boolean loaded = false;
 	Stack<Float> preAngle = new Stack<Float>();
 	ImageView img;
-	
-	//Dial-chart
-	DialView dv;
-	RelativeLayout mLayout;
 	
 	public void updateTextView(final TextView view, final String txt) {
 		new Handler().post(new Runnable() {
@@ -111,7 +107,7 @@ public class MonitorActivity extends Activity {
 		setContentView(R.layout.monitor);
 		
 		//add DialView to RelativeLayout
-		mLayout = (RelativeLayout)findViewById(R.id.vehicle_view);
+		//mLayout = (RelativeLayout)findViewById(R.id.vehicle_view);
 		//dv = new DialView(this, null);		
 		//mLayout.addView(dv);
 		img = (ImageView) findViewById(R.id.tick);
@@ -169,7 +165,7 @@ public class MonitorActivity extends Activity {
 				
 				float fromAngle = 0;
 				
-				float angle =  rpm / 8192.0f * 195.0f ;		
+				float angle =  rpm / rpmMax * 195.0f ;		
 				Log.d("angle", angle+"");
 				
 				preAngle.push(angle);
@@ -180,7 +176,9 @@ public class MonitorActivity extends Activity {
 				Log.d("fromAngle, toAngle", fromAngle+", "+angle);
 				
 				Animation anim = new RotateAnimation(fromAngle, angle, 101*2, 35);
-		        anim.setDuration(1000);  
+		        
+		        anim.setDuration(800);
+		        
 		        img.setAnimation(anim);
 		        anim.startNow();
 		        
@@ -191,7 +189,7 @@ public class MonitorActivity extends Activity {
 					e.printStackTrace();
 				}
 				
-				int temp = rpmMax - rpm; 					
+				float temp = rpmMax - rpm; 					
 				float rate = (float)(1.5 - (Math.log(temp>0 ? temp:1)/Math.log(rpmMax)));	
 				
 				soundPool.setRate(vehicle, rate);
